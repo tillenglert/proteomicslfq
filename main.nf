@@ -683,7 +683,6 @@ process search_engine_msfragger {
                       -precursor_mass_lower ${prec_tol} \\
                       -precursor_mass_upper ${prec_tol} \\
                       -precursor_mass_unit ${prec_tol_unit} \\
-                      -fragment_mass_tolerance ${bin_tol} \\
                       -debug ${params.db_debug} \\
 		                  -force \\
                       > ${mzml_file.baseName}_msfragger.log
