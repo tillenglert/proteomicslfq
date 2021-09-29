@@ -227,7 +227,7 @@ if (!sdrf_file)
   ch_spectra = Channel.fromPath(spectra_files, checkIfExists: true)
   ch_spectra
   .multiMap{ it -> id = it.toString().md5()
-                    comet_settings: msgf_settings: tuple(id,
+                    comet_settings: msgf_settings: msfragger_settings: tuple(id,
                                     params.fixed_mods,
                                     params.variable_mods,
                                     "", //labelling modifications currently not supported
@@ -277,7 +277,7 @@ else
   ch_sdrf_config_file
   .splitCsv(skip: 1, sep: '\t')
   .multiMap{ row -> id = row.toString().md5()
-                    comet_settings: msgf_settings: tuple(id,
+                    comet_settings: msgf_settings: msfragger_settings: tuple(id,
                                     row[2],
                                     row[3],
                                     row[4],
@@ -394,18 +394,18 @@ process mzml_indexing {
 if (params.openms_peakpicking)
 {
   branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).set{mzmls_pp}
-  (mzmls_comet, mzmls_msgf, mzmls_luciphor, mzmls_plfq) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
+  (mzmls_comet, mzmls_msgf, mzmls_msfragger, mzmls_luciphor, mzmls_plfq) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
 }
 else
 {
-  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_luciphor; mzmls_plfq}
+  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_msfragger; mzmls_luciphor; mzmls_plfq}
   mzmls_pp = Channel.empty()
 }
 
 //Fill the channels with empty Channels in case that we want to add decoys. Otherwise fill with output from database.
-(searchengine_in_db_msgf, searchengine_in_db_comet, pepidx_in_db, plfq_in_db) = ( params.add_decoys
-                    ? [ Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty() ]
-                    : [ Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database) ] )
+(searchengine_in_db_msgf, searchengine_in_db_comet, searchengine_in_db_msfragger, pepidx_in_db, plfq_in_db) = ( params.add_decoys
+                    ? [ Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty() ]
+                    : [ Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database) ] )
 
 //Add decoys if params.add_decoys is set appropriately
 process generate_decoy_database {
@@ -419,7 +419,7 @@ process generate_decoy_database {
      file(mydatabase) from ch_db_for_decoy_creation
 
     output:
-     file "${mydatabase.baseName}_decoy.fasta" into searchengine_in_db_decoy_msgf, searchengine_in_db_decoy_comet, pepidx_in_db_decoy, plfq_in_db_decoy
+     file "${mydatabase.baseName}_decoy.fasta" into searchengine_in_db_decoy_msgf, searchengine_in_db_decoy_comet, searchengine_in_db_decoy_msfragger, pepidx_in_db_decoy, plfq_in_db_decoy
      file "*.log"
 
     when:
@@ -467,7 +467,7 @@ process openms_peakpicker {
       params.openms_peakpicking
 
     output:
-     tuple mzml_id, file("out/${mzml_file.baseName}.mzML") into mzmls_comet_picked, mzmls_msgf_picked, mzmls_plfq_picked
+     tuple mzml_id, file("out/${mzml_file.baseName}.mzML") into mzmls_comet_picked, mzmls_msgf_picked, mzmls_msfragger_picked, mzmls_plfq_picked
      file "*.log"
 
     script:
@@ -647,6 +647,49 @@ process search_engine_comet {
      """
 }
 
+process search_engine_msfragger {
+
+    label 'process_medium'
+
+    publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
+
+    // ---------------------------------------------------------------------------------------------------------------------
+    // ------------- WARNING: If you experience nextflow running forever after a failure, set the following ----------------
+    // ---------------------------------------------------------------------------------------------------------------------
+    // This is probably true for other processes as well. See https://github.com/nextflow-io/nextflow/issues/1457
+    //errorStrategy 'terminate'
+    
+    input:
+     tuple file(database), val(mzml_id), path(mzml_file), fixed, variable, label, prec_tol, prec_tol_unit, frag_tol, frag_tol_unit, diss_meth, enzyme from searchengine_in_db_msfragger.mix(searchengine_in_db_decoy_msfragger).combine(mzmls_msfragger.mix(mzmls_msfragger_picked).join(ch_sdrf_config.msfragger_settings))
+
+    when:
+      params.search_engines.contains("msfragger")
+
+    output:
+     tuple mzml_id, file("${mzml_file.baseName}_msfragger.idXML") into id_files_msfragger
+     file "*.log"
+
+    script:
+     """
+     MSFraggerAdapter -in ${mzml_file} \\
+                      -out ${mzml_file.baseName}_msfragger.idXML \\
+                      -threads ${task.cpus} \\
+                      -database "${database}" \\
+                      -allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
+                      -num_enzyme_termini ${params.num_enzyme_termini} \\
+                      -search_enzyme_name "${enzyme}" \\
+                      -fixed_modifications_unimod ${fixed.tokenize(',').collect { "'${it}'" }.join(" ") } \\
+                      -variable_modifications_unimod ${variable.tokenize(',').collect { "'${it}'" }.join(" ") } \\
+                      -precursor_mass_lower ${prec_tol} \\
+                      -precursor_mass_upper ${prec_tol} \\
+                      -precursor_mass_unit ${prec_tol_unit} \\
+                      -fragment_mass_tolerance ${bin_tol} \\
+                      -debug ${params.db_debug} \\
+		                  -force \\
+                      > ${mzml_file.baseName}_msfragger.log
+     """
+}
+
 
 process index_peptides {
 
@@ -655,7 +698,7 @@ process index_peptides {
     publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
 
     input:
-     tuple mzml_id, file(id_file), val(enzyme), file(database) from id_files_msgf.mix(id_files_comet).combine(ch_sdrf_config.idx_settings, by: 0).combine(pepidx_in_db.mix(pepidx_in_db_decoy))
+     tuple mzml_id, file(id_file), val(enzyme), file(database) from id_files_msgf.mix(id_files_comet).mix(id_files_msfragger).combine(ch_sdrf_config.idx_settings, by: 0).combine(pepidx_in_db.mix(pepidx_in_db_decoy))
 
     output:
      tuple mzml_id, file("${id_file.baseName}_idx.idXML") into id_files_idx_ForPerc, id_files_idx_ForIDPEP, id_files_idx_ForIDPEP_noFDR
