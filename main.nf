@@ -676,17 +676,17 @@ process search_engine_msfragger {
      MSFraggerAdapter -in ${mzml_file} \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
+                      -license yes \\
                       -database "${database}" \\
                       -allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
                       -num_enzyme_termini ${params.num_enzyme_termini} \\
                       -search_enzyme_name "${enzyme}" \\
                       -fixed_modifications_unimod ${fixed.tokenize(',').collect { "'${it}'" }.join(" ") } \\
                       -variable_modifications_unimod ${variable.tokenize(',').collect { "'${it}'" }.join(" ") } \\
-                      -precursor_mass_lower ${prec_tol} \\
-                      -precursor_mass_upper ${prec_tol} \\
+                      -precursor_mass_tolerance_lower ${prec_tol} \\
+                      -precursor_mass_tolerance_upper ${prec_tol} \\
                       -precursor_mass_unit ${prec_tol_unit} \\
                       -debug ${params.db_debug} \\
-		                  -force \\
                       > ${mzml_file.baseName}_msfragger.log
      """
 }
