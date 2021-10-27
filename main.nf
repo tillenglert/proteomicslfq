@@ -649,6 +649,8 @@ process search_engine_comet {
 
 process search_engine_msfragger {
 
+    container = 'tillenglert/oopenms:latest'
+
     label 'process_medium'
 
     publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
