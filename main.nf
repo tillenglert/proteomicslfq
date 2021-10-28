@@ -678,14 +678,14 @@ process search_engine_msfragger {
                       -threads ${task.cpus} \\
                       -license yes \\
                       -database "${database}" \\
-                      -allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
-                      -num_enzyme_termini ${params.num_enzyme_termini} \\
-                      -search_enzyme_name "${enzyme}" \\
-                      -fixed_modifications_unimod ${fixed.tokenize(',').collect { "'${it}'" }.join(" ") } \\
-                      -variable_modifications_unimod ${variable.tokenize(',').collect { "'${it}'" }.join(" ") } \\
-                      -precursor_mass_tolerance_lower ${prec_tol} \\
-                      -precursor_mass_tolerance_upper ${prec_tol} \\
-                      -precursor_mass_unit ${prec_tol_unit} \\
+                      -digest:allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
+                      -digest:num_enzyme_termini ${params.num_enzyme_termini} \\
+                      -digest:search_enzyme_name "${enzyme}" \\
+                      -statmod:unimod ${fixed.tokenize(',').collect { "'${it}'" }.join(" ") } \\
+                      -varmod:unimod ${variable.tokenize(',').collect { "'${it}'" }.join(" ") } \\
+                      -tolerance:precursor_mass_tolerance_lower ${prec_tol} \\
+                      -tolerance:precursor_mass_tolerance_upper ${prec_tol} \\
+                      -tolerance:precursor_mass_unit ${prec_tol_unit} \\
                       -debug ${params.db_debug} \\
                       > ${mzml_file.baseName}_msfragger.log
      """
