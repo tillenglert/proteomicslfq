@@ -686,7 +686,7 @@ process search_engine_msfragger {
                       -tolerance:precursor_mass_tolerance_lower ${prec_tol} \\
                       -tolerance:precursor_mass_tolerance_upper ${prec_tol} \\
                       -tolerance:precursor_mass_unit ${prec_tol_unit} \\
-                      -debug ${params.db_debug} \\
+                      -debug 2 \\
                       > ${mzml_file.baseName}_msfragger.log
      """
 }
