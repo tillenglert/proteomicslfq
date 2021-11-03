@@ -673,7 +673,10 @@ process search_engine_msfragger {
 
     script:
      """
-     MSFraggerAdapter -_in ${mzml_file} \\
+     MSFraggerAdapter --helphelp > ${mzml_file.baseName}_msfragger.log
+     OpenMSInfo > ${mzml_file.baseName}_msfragger.log
+     which MSFraggerAdapter > ${mzml_file.baseName}_msfragger.log
+     MSFraggerAdapter -in ${mzml_file} \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
