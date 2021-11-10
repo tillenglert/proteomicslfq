@@ -689,7 +689,6 @@ process search_engine_msfragger {
                       -tolerance:precursor_mass_unit ${prec_tol_unit} \\
                       -debug 2 \\
                       > ${mzml_file.baseName}_msfragger.log
-    rm $workflow.workDir/$database $workflow.workDir/$mzml_file
      """
 }
 
