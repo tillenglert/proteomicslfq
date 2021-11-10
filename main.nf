@@ -671,12 +671,15 @@ process search_engine_msfragger {
 
     script:
      """
-     readlink -f $database > ${mzml_file.baseName}_msfragger.log
-     MSFraggerAdapter -in "$PWD/${mzml_file}" \\
+
+     DATABASE_PATH=$(readlink -f $database)
+     MZML_PATH=$(readlink -f $mzml_file)
+
+     MSFraggerAdapter -in "MZML_PATH" \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
-                      -database "$PWD/${database}" \\
+                      -database "$DATABASE_PATH" \\
                       -digest:allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
                       -digest:num_enzyme_termini ${params.num_enzyme_termini} \\
                       -digest:search_enzyme_name "${enzyme}" \\
