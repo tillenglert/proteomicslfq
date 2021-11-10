@@ -671,14 +671,11 @@ process search_engine_msfragger {
 
     script:
      """
-     cp $database $workflow.workDir/$database
-     cp $mzml_file $workflow.workDir/$mzml_file
-
-     MSFraggerAdapter -in "$workflow.workDir/${mzml_file}" \\
+     MSFraggerAdapter -in "$pwd/${mzml_file}" \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
-                      -database "$workflow.workDir/${database}" \\
+                      -database "$pwd/${database}" \\
                       -digest:allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
                       -digest:num_enzyme_termini ${params.num_enzyme_termini} \\
                       -digest:search_enzyme_name "${enzyme}" \\
