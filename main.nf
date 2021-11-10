@@ -671,11 +671,9 @@ process search_engine_msfragger {
 
     script:
      """
-
      DATABASE_PATH='readlink -f $database'
      MZML_PATH='readlink -f $mzml_file'
-
-     MSFraggerAdapter -in "MZML_PATH" \\
+     MSFraggerAdapter -in "$MZML_PATH" \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
