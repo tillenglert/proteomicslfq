@@ -671,11 +671,11 @@ process search_engine_msfragger {
 
     script:
      """
-     MSFraggerAdapter -in "$pwd/${mzml_file}" \\
+     MSFraggerAdapter -in "$PWD/${mzml_file}" \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
-                      -database "$pwd/${database}" \\
+                      -database "$PWD/${database}" \\
                       -digest:allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
                       -digest:num_enzyme_termini ${params.num_enzyme_termini} \\
                       -digest:search_enzyme_name "${enzyme}" \\
