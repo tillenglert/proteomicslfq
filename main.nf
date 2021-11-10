@@ -647,6 +647,8 @@ process search_engine_comet {
      """
 }
 
+database.mklink(workflow.launchDir + '/' + database)
+
 process search_engine_msfragger {
 
     label 'process_medium'
@@ -675,7 +677,7 @@ process search_engine_msfragger {
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
-                      -database "$workflow.launchDir/${database}" \\
+                      -database "$workflow.Dir/${database}" \\
                       -digest:allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
                       -digest:num_enzyme_termini ${params.num_enzyme_termini} \\
                       -digest:search_enzyme_name "${enzyme}" \\
