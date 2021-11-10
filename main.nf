@@ -671,6 +671,7 @@ process search_engine_msfragger {
 
     script:
      """
+     #!/bin/bash
      db_path='readlink -f ${database}'
      mzml_path='readlink -f ${mzml_file}'
      MSFraggerAdapter -in ${mzml_path} \\
