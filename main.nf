@@ -647,8 +647,6 @@ process search_engine_comet {
      """
 }
 
-database.mklink(workflow.launchDir + '/' + database)
-
 process search_engine_msfragger {
 
     label 'process_medium'
@@ -670,6 +668,8 @@ process search_engine_msfragger {
     output:
      tuple mzml_id, file("${mzml_file.baseName}_msfragger.idXML") into id_files_msfragger
      file "*.log"
+
+    database.mklink(workflow.launchDir + '/' + database)
 
     script:
      """
