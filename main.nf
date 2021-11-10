@@ -669,15 +669,14 @@ process search_engine_msfragger {
      tuple mzml_id, file("${mzml_file.baseName}_msfragger.idXML") into id_files_msfragger
      file "*.log"
 
-    database.mklink(workflow.launchDir + '/' + database)
-
     script:
      """
+     cp $database $workflow.workDir/$database
      MSFraggerAdapter -in ${mzml_file} \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
-                      -database "$workflow.Dir/${database}" \\
+                      -database "$workflow.workDir/${database}" \\
                       -digest:allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
                       -digest:num_enzyme_termini ${params.num_enzyme_termini} \\
                       -digest:search_enzyme_name "${enzyme}" \\
@@ -688,6 +687,7 @@ process search_engine_msfragger {
                       -tolerance:precursor_mass_unit ${prec_tol_unit} \\
                       -debug 2 \\
                       > ${mzml_file.baseName}_msfragger.log
+    rm $workflow.workDir/$database
      """
 }
 
