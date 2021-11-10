@@ -671,6 +671,7 @@ process search_engine_msfragger {
 
     script:
      """
+     readlink -f $database > ${mzml_file.baseName}_msfragger.log
      MSFraggerAdapter -in "$PWD/${mzml_file}" \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
@@ -685,7 +686,7 @@ process search_engine_msfragger {
                       -tolerance:precursor_mass_tolerance_upper ${prec_tol} \\
                       -tolerance:precursor_mass_unit ${prec_tol_unit} \\
                       -debug 2 \\
-                      > ${mzml_file.baseName}_msfragger.log
+                      >> ${mzml_file.baseName}_msfragger.log
      """
 }
 
