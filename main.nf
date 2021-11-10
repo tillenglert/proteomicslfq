@@ -660,7 +660,7 @@ process search_engine_msfragger {
     //errorStrategy 'terminate'
     
     input:
-     tuple val(database), val(mzml_id), path(mzml_file), fixed, variable, label, prec_tol, prec_tol_unit, frag_tol, frag_tol_unit, diss_meth, enzyme from searchengine_in_db_msfragger.mix(searchengine_in_db_decoy_msfragger).combine(mzmls_msfragger.mix(mzmls_msfragger_picked).join(ch_sdrf_config.msfragger_settings))
+     tuple file(database), val(mzml_id), path(mzml_file), fixed, variable, label, prec_tol, prec_tol_unit, frag_tol, frag_tol_unit, diss_meth, enzyme from searchengine_in_db_msfragger.mix(searchengine_in_db_decoy_msfragger).combine(mzmls_msfragger.mix(mzmls_msfragger_picked).join(ch_sdrf_config.msfragger_settings))
 
     when:
       params.search_engines.contains("msfragger")
@@ -675,7 +675,7 @@ process search_engine_msfragger {
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
-                      -database "${database}" \\
+                      -database "$PWD/${database}" \\
                       -digest:allowed_missed_cleavage ${params.allowed_missed_cleavages} \\
                       -digest:num_enzyme_termini ${params.num_enzyme_termini} \\
                       -digest:search_enzyme_name "${enzyme}" \\
