@@ -672,7 +672,9 @@ process search_engine_msfragger {
     script:
      """
      cp $database $workflow.workDir/$database
-     MSFraggerAdapter -in ${mzml_file} \\
+     cp $mzml_file $workflow.workDir/$mzml_file
+
+     MSFraggerAdapter -in "$workflow.workDir/${mzml_file}" \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
                       -threads ${task.cpus} \\
                       -license yes \\
@@ -687,7 +689,7 @@ process search_engine_msfragger {
                       -tolerance:precursor_mass_unit ${prec_tol_unit} \\
                       -debug 2 \\
                       > ${mzml_file.baseName}_msfragger.log
-    rm $workflow.workDir/$database
+    rm $workflow.workDir/$database $workflow.workDir/$mzml_file
      """
 }
 
