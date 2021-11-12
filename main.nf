@@ -673,6 +673,7 @@ process search_engine_msfragger {
      """
      MSFraggerAdapter -in \$PWD/${mzml_file} \\
                       -out ${mzml_file.baseName}_msfragger.idXML \\
+                      -opt_out ${mzml_file.baseName}_msfragger.pepXML
                       -threads ${task.cpus} \\
                       -license yes \\
                       -database \$PWD/${database} \\
