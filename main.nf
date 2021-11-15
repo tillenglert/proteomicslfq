@@ -639,7 +639,7 @@ process search_engine_comet {
                    -max_variable_mods_in_peptide ${params.max_mods} \\
                    -precursor_mass_tolerance ${prec_tol} \\
                    -precursor_error_units ${prec_tol_unit} \\
-                   -fragment_mass_tolerance ${bin_tol} \\
+                   -fragment_mass_tolerance ${frag_tol} \\
                    -fragment_bin_offset ${bin_offset} \\
                    -debug ${params.db_debug} \\
 		   -force \\
@@ -685,6 +685,8 @@ process search_engine_msfragger {
                       -tolerance:precursor_mass_tolerance_lower ${prec_tol} \\
                       -tolerance:precursor_mass_tolerance_upper ${prec_tol} \\
                       -tolerance:precursor_mass_unit ${prec_tol_unit} \\
+                      -tolerance:fragment_mass_tolerance ${bin_tol} \\
+                      -tolerance:fragment_mass_unit ${frag_tol_unit} \\
                       -debug 2 \\
                       >> ${mzml_file.baseName}_msfragger.log
      """
