@@ -394,7 +394,7 @@ process mzml_indexing {
 if (params.openms_peakpicking)
 {
   branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).set{mzmls_pp}
-  (mzmls_comet, mzmls_msgf, mzmls_msfragger, mzmls_luciphor, mzmls_plfq; mzmls_peptideprophet; mzmls_ptmshepherd) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
+  (mzmls_comet, mzmls_msgf, mzmls_msfragger, mzmls_luciphor, mzmls_plfq, mzmls_peptideprophet, mzmls_ptmshepherd) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
 }
 else
 {
