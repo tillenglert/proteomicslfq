@@ -398,7 +398,7 @@ if (params.openms_peakpicking)
 }
 else
 {
-  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_msfragger; mzmls_luciphor; mzmls_plfq, mzmls_peptideprophet}
+  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_msfragger; mzmls_luciphor; mzmls_plfq; mzmls_peptideprophet}
   mzmls_pp = Channel.empty()
 }
 
