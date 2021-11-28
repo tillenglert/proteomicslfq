@@ -705,7 +705,7 @@ process peptideprophet {
     input:
     file database from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet)
     tuple val(mzml_id), path(mzml_file) from mzmls_peptideprophet.mix(mzmls_peptideprophet_picked)
-    file pepXMLs from pepXML_ch.collect()
+    file pepXMLs from pep_files_masfragger.collect()
 
     output:
     file "psm.tsv" into psm_ch
