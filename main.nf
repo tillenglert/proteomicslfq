@@ -703,10 +703,13 @@ process peptideprophet {
       params.search_engines.contains("msfragger")
 
     input:
-    tuple file(database), val(mzml_id), path(mzml_file), pepXMLs from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(mzmls_peptideprophet.mix(mzmls_peptideprophet_picked).mix(pepXML_ch.collect())
+    file database from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet)
+    tuple val(mzml_id), path(mzml_file) from mzmls_peptideprophet.mix(mzmls_peptideprophet_picked)
+    pepXMLs from pepXML_ch.collect()
 
     output:
     file "psm.tsv" into psm_ch
+    file "*.log"
 
     """
     philosopher workspace --clean >> ${mzml_file.baseName}_peptideprophet.log
@@ -730,10 +733,12 @@ process ptmshepherd {
       params.search_engines.contains("msfragger")
 
     input:
-    tuple file(psm), val(mzml_id), path(mzml_file) from psm_ch.combine(mzmls_peptideprophet.mix(mzmls_peptideprophet_picked)
+    file psm from psm_ch
+    tuple val(mzml_id), path(mzml_file) from mzmls_peptideprophet.mix(mzmls_peptideprophet_picked)
 
     output:
     file "global.modsummary.tsv" into globalmod_ch
+    file "*.log"
 
     """
     echo "
@@ -764,6 +769,10 @@ process deltamass {
 
     input:
     file globalmod from globalmod_ch
+
+    output:
+    file "${custom_runName}_delta-mass.html"
+    file "*.log"
 
     """
     python3 /thirdparty/MSFragger/Delta_Mass_Hist.py -i $globalmod -o ${custom_runName}_delta-mass.html > ${custom_runName}_delta_mass.log
