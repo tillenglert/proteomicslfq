@@ -712,14 +712,14 @@ process peptideprophet {
     file "*.log"
 
     """
-    philosopher workspace --clean >> ${mzml_file.baseName}_peptideprophet.log
-    philosopher workspace --init >> ${mzml_file.baseName}_peptideprophet.log
-    philosopher database --custom ${database} >> ${mzml_file.baseName}_peptideprophet.log
+    philosopher workspace --clean >> peptideprophet.log
+    philosopher workspace --init >> peptideprophet.log
+    philosopher database --custom ${database} >> peptideprophet.log
     for pepXML in $pepXMLs; do
-        philosopher peptideprophet --database $database --combine --ppm --accmass --expectscore --decoyprobs --nonparam \$pepXML >> ${mzml_file.baseName}_peptideprophet.log
+        philosopher peptideprophet --database $database --combine --ppm --accmass --expectscore --decoyprobs --nonparam \$pepXML >> \${pepXML.baseName}_peptideprophet.log
     done
-    philosopher filter --razor --pepxml "interact-${mzml_file.baseName}.pep.xml" >> ${mzml_file.baseName}_peptideprophet.log
-    philosopher report >> ${mzml_file.baseName}_peptideprophet.log
+    philosopher filter --razor --pepxml --tag $params.decoy_affix interact.pep.xml >> peptideprophet.log
+    philosopher report >> peptideprophet.log
     """
 }
 
