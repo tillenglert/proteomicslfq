@@ -749,7 +749,7 @@ process ptmshepherd {
 
     """
     echo "
-    dataset = ${custom_runName} $psm ${mzML_file.parent}
+    dataset = ${custom_runName} $psm ${mzml_file.parent}
     threads = ${task.cpus}
     histo_bindivs = 5000
     histo_smoothbins = 2
