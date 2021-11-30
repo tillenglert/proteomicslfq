@@ -740,7 +740,7 @@ process ptmshepherd {
 
     input:
     file psm from psm_ch
-    list mzmls from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked).collect()
+    val mzmls from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked).collect()
 
     output:
     file "global.modsummary.tsv" into globalmod_ch
