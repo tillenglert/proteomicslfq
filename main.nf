@@ -741,7 +741,7 @@ process ptmshepherd {
 
     input:
     file psm from psm_ch
-    tuple val(mzml_id), path(mzml_file) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)
+    tuple val(mzml_id), path(mzml_file) from mzmls_ptmshepherd.combine(mzmls_ptmshepherd_picked)
 
     output:
     file "global.modsummary.tsv" into globalmod_ch
@@ -749,7 +749,7 @@ process ptmshepherd {
 
     """
     echo "
-    dataset = ${custom_runName} $psm ${mzml_file.parent}
+    dataset = ${custom_runName} $psm \$PWD
     threads = ${task.cpus}
     histo_bindivs = 5000
     histo_smoothbins = 2
