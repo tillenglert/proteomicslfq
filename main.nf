@@ -394,11 +394,11 @@ process mzml_indexing {
 if (params.openms_peakpicking)
 {
   branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).set{mzmls_pp}
-  (mzmls_comet, mzmls_msgf, mzmls_msfragger, mzmls_luciphor, mzmls_plfq, mzmls_peptideprophet, mzmls_ptmshepherd) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
+  (mzmls_comet, mzmls_msgf, mzmls_msfragger, mzmls_luciphor, mzmls_plfq, mzmls_ptmshepherd) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
 }
 else
 {
-  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_msfragger; mzmls_luciphor; mzmls_plfq; mzmls_peptideprophet; mzmls_ptmshepherd}
+  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_msfragger; mzmls_luciphor; mzmls_plfq; mzmls_ptmshepherd}
   mzmls_pp = Channel.empty()
 }
 
@@ -467,8 +467,7 @@ process openms_peakpicker {
       params.openms_peakpicking
 
     output:
-     tuple mzml_id, file("out/${mzml_file.baseName}.mzML") into mzmls_comet_picked, mzmls_msgf_picked, mzmls_msfragger_picked, mzmls_plfq_picked, mzmls_peptideprophet_picked, mzmls_ptmshepherd_picked
-     file "*.log"
+     tuple mzml_id, file("out/${mzml_file.baseName}.mzML") into mzmls_comet_picked, mzmls_msgf_picked, mzmls_msfragger_picked, mzmls_plfq_picked, mzmls_ptmshepherd_picked
 
     script:
      in_mem = params.peakpicking_inmemory ? "inmemory" : "lowmemory"
