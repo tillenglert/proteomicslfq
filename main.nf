@@ -729,6 +729,11 @@ process peptideprophet {
     """
 }
 
+mzml_ids = Channel.create()
+mzml_files = Channel.create()
+
+Channel.from(mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)).separate( mzml_ids, mzml_files )
+
 process ptmshepherd {
 
     label 'process_low'
@@ -740,7 +745,7 @@ process ptmshepherd {
 
     input:
     file psm from psm_ch
-    path mzmls from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked).collect().filter( ~/\*.mzML/ )
+    path mzmls from mzml_files.collect()
 
     output:
     file "global.modsummary.tsv" into globalmod_ch
