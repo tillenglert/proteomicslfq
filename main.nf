@@ -724,7 +724,7 @@ process peptideprophet {
         philosopher peptideprophet --database ${database} --decoy ${params.decoy_affix} --enzyme ${params.enzyme} --combine --ppm --accmass --expectscore --decoyprobs --nonparam \$pepXML >> peptideprophet.log
     done
 
-    echo "------------Postprocess------------" >> peptideprophet.log
+    echo "\n------------Postprocess------------" >> peptideprophet.log
     philosopher filter --pepxml interact.pep.xml --tag ${params.decoy_affix} >> peptideprophet.log
     philosopher report >> peptideprophet.log
     """
@@ -741,7 +741,7 @@ process ptmshepherd {
 
     input:
     file psm from psm_ch
-    tuple val(mzml_id), path(mzml_file) from mzmls_ptmshepherd.combine(mzmls_ptmshepherd_picked)
+    tuple val(mzml_id), path(mzml_file) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)
 
     output:
     file "global.modsummary.tsv" into globalmod_ch
