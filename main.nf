@@ -729,10 +729,7 @@ process peptideprophet {
     """
 }
 
-mzml_ids = Channel.create()
-mzml_files = Channel.create()
-
-Channel.from(mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)).separate( mzml_ids, mzml_files )
+(mzml_ids, mzml_files) = (mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)).separate(2)
 
 process ptmshepherd {
 
