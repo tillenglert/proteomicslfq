@@ -719,7 +719,7 @@ process peptideprophet {
 
     echo "--------------Read Files--------------" >> peptideprophet.log
     for pepXML in ${pepXMLs}; do
-        echo "---------\$pepXML---------" >> peptideprophet.log
+        echo "\n---------\$pepXML---------" >> peptideprophet.log
         philosopher peptideprophet --database ${database} --decoy ${params.decoy_affix} --enzyme ${params.enzyme} --combine --ppm --accmass --expectscore --decoyprobs --nonparam \$pepXML >> peptideprophet.log
     done
 
