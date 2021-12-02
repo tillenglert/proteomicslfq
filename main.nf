@@ -227,7 +227,7 @@ if (!sdrf_file)
   ch_spectra = Channel.fromPath(spectra_files, checkIfExists: true)
   ch_spectra
   .multiMap{ it -> id = it.toString().md5()
-                    comet_settings: msgf_settings: msfragger_settings: tuple(id,
+                    comet_settings: msgf_settings: msfragger_settings: msfragger_open_settings: tuple(id,
                                     params.fixed_mods,
                                     params.variable_mods,
                                     "", //labelling modifications currently not supported
