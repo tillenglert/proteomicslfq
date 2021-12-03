@@ -823,7 +823,6 @@ process deltamass {
 
     output:
     file "${custom_runName}_delta-mass.html"
-    file "*.log"
 
     """
     python3 /thirdparty/MSFragger/Delta_Mass_Hist.py -i $globalmod -o ${custom_runName}_delta-mass.html
