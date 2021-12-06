@@ -800,7 +800,7 @@ process peptideprophet_single {
     philosopher peptideprophet --database ${database} --ppm --accmass --expectscore --decoyprobs --nonparam ${pepXML} >> ${pepXML.baseName}_peptideprophet.log
 
     echo "\n------------Postprocess------------" >> ${pepXML.baseName}_peptideprophet.log
-    philosopher filter --pepxml "interact-${pepXML.baseName}.pep.xml --tag ${params.decoy_affix}" >> ${pepXML.baseName}_peptideprophet.log
+    philosopher filter --pepxml "interact-${pepXML.baseName}.pep.xml" --tag ${params.decoy_affix} >> ${pepXML.baseName}_peptideprophet.log
     philosopher report >> ${pepXML.baseName}_peptideprophet.log
     """
 }
