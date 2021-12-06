@@ -845,7 +845,7 @@ process ptmshepherd_all {
     """
 }
 
-process PTMShepherd {
+process ptmshepherd_single {
 
     label 'process_low'
 
