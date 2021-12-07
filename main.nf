@@ -744,9 +744,7 @@ process peptideprophet {
       params.search_engines.contains("msfragger")
 
     input:
-    file database from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet)
-    file pepXML from pep_files_msfragger
-
+    tuple file(database), file(pepXML) from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(pep_files_msfragger)
     output:
     file "psm.tsv" into psm_ch
     file "*.log"
