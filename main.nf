@@ -813,7 +813,7 @@ process deltamass {
     publishDir "${params.outdir}/Open_Search", mode: 'copy'
 
     input:
-    file globalmod from globalmod_ch_single
+    file globalmod from globalmod_ch
     tuple val(mzml_id), file(mzml_file) from mzmls_deltamass.mix(mzmls_deltamass_picked)
 
     output:
