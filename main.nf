@@ -394,18 +394,18 @@ process mzml_indexing {
 if (params.openms_peakpicking)
 {
   branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).set{mzmls_pp}
-  (mzmls_comet, mzmls_msgf, mzmls_msfragger, mzmls_msfragger, mzmls_luciphor, mzmls_plfq, mzmls_ptmshepherd, mzmls_ptmshepherd_single, mzmls_deltamass) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
+  (mzmls_comet, mzmls_msgf, mzmls_msfragger, mzmls_msfragger, mzmls_luciphor, mzmls_plfq, mzmls_ptmshepherd, mzmls_deltamass) = [Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty()]
 }
 else
 {
-  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_msfragger; mzmls_msfragger_open; mzmls_luciphor; mzmls_plfq; mzmls_ptmshepherd; mzmls_ptmshepherd_single; mzmls_deltamass}
+  branched_input_mzMLs.inputIndexedMzML.mix(mzmls_converted).mix(mzmls_indexed).into{mzmls_comet; mzmls_msgf; mzmls_msfragger; mzmls_msfragger_open; mzmls_luciphor; mzmls_plfq; mzmls_ptmshepherd; mzmls_deltamass}
   mzmls_pp = Channel.empty()
 }
 
 //Fill the channels with empty Channels in case that we want to add decoys. Otherwise fill with output from database.
-(searchengine_in_db_msgf, searchengine_in_db_comet, searchengine_in_db_msfragger, searchengine_in_db_msfragger_open, searchengine_in_db_peptideprophet_all, searchengine_in_db_peptideprophet_single, pepidx_in_db, plfq_in_db) = ( params.add_decoys
-                    ? [ Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty() ]
-                    : [ Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database) ] )
+(searchengine_in_db_msgf, searchengine_in_db_comet, searchengine_in_db_msfragger, searchengine_in_db_msfragger_open, searchengine_in_db_peptideprophet, pepidx_in_db, plfq_in_db) = ( params.add_decoys
+                    ? [ Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty(), Channel.empty() ]
+                    : [ Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database), Channel.fromPath(params.database) ] )
 
 //Add decoys if params.add_decoys is set appropriately
 process generate_decoy_database {
@@ -419,7 +419,7 @@ process generate_decoy_database {
      file(mydatabase) from ch_db_for_decoy_creation
 
     output:
-     file "${mydatabase.baseName}_decoy.fasta" into searchengine_in_db_decoy_msgf, searchengine_in_db_decoy_comet, searchengine_in_db_decoy_msfragger, searchengine_in_db_decoy_msfragger_open, searchengine_in_db_decoy_peptideprophet_all, searchengine_in_db_decoy_peptideprophet_single, pepidx_in_db_decoy, plfq_in_db_decoy
+     file "${mydatabase.baseName}_decoy.fasta" into searchengine_in_db_decoy_msgf, searchengine_in_db_decoy_comet, searchengine_in_db_decoy_msfragger, searchengine_in_db_decoy_msfragger_open, searchengine_in_db_decoy_peptideprophet, pepidx_in_db_decoy, plfq_in_db_decoy
      file "*.log"
 
     when:
@@ -467,7 +467,7 @@ process openms_peakpicker {
       params.openms_peakpicking
 
     output:
-     tuple mzml_id, file("out/${mzml_file.baseName}.mzML") into mzmls_comet_picked, mzmls_msgf_picked, mzmls_msfragger_picked, mzmls_msfragger_open_picked, mzmls_plfq_picked, mzmls_ptmshepherd_picked, mzmls_ptmshepherd_single_picked, mzmls_deltamass_picked
+     tuple mzml_id, file("out/${mzml_file.baseName}.mzML") into mzmls_comet_picked, mzmls_msgf_picked, mzmls_msfragger_picked, mzmls_msfragger_open_picked, mzmls_plfq_picked, mzmls_ptmshepherd_picked, mzmls_deltamass_picked
 
     script:
      in_mem = params.peakpicking_inmemory ? "inmemory" : "lowmemory"
@@ -709,7 +709,7 @@ process search_engine_msfragger_open {
       params.search_engines.contains("msfragger")
 
     output:
-     file("${mzml_file.baseName}_msfragger.pepXML") into pep_files_msfragger_all, pep_files_msfragger_single
+     file("${mzml_file.baseName}_msfragger.pepXML") into pep_files_msfragger
      file "*.log"
 
     script:
@@ -728,15 +728,14 @@ process search_engine_msfragger_open {
                       -tolerance:precursor_mass_tolerance_lower 150 \\
                       -tolerance:precursor_mass_tolerance_upper 500 \\
                       -tolerance:precursor_mass_unit Da \\
-                      -tolerance:fragment_mass_tolerance 20 \\
-                      -tolerance:fragment_mass_unit ppm \\
+                      -tolerance:fragment_mass_tolerance ${frag_tol} \\
+                      -tolerance:fragment_mass_unit ${frag_tol_unit} \\
                       -debug ${params.db_debug} \\
                       > ${mzml_file.baseName}_msfragger.log
      """
 }
 
-process peptideprophet_all {
-
+process peptideprophet {
     label 'process_low'
 
     publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
@@ -745,47 +744,11 @@ process peptideprophet_all {
       params.search_engines.contains("msfragger")
 
     input:
-    file database from searchengine_in_db_peptideprophet_all.mix(searchengine_in_db_decoy_peptideprophet_all)
-    file pepXMLs from pep_files_msfragger_all.collect()
+    file database from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet)
+    file pepXML from pep_files_msfragger
 
     output:
-    file "psm.tsv" into psm_ch_all
-    file "*.log"
-
-    """
-    echo "------------Workspace init------------" >> peptideprophet.log
-    philosopher workspace --clean >> peptideprophet.log
-    philosopher workspace --init >> peptideprophet.log
-
-    echo "------------Read Database-------------" >> peptideprophet.log
-    philosopher database --custom ${database} >> peptideprophet.log
-
-    echo "--------------Read Files--------------" >> peptideprophet.log
-    for pepXML in ${pepXMLs}; do
-        echo "\n---------\$pepXML---------" >> peptideprophet.log
-        philosopher peptideprophet --database ${database} --decoy ${params.decoy_affix} --enzyme ${params.enzyme} --combine --ppm --accmass --expectscore --decoyprobs --nonparam \$pepXML >> peptideprophet.log
-    done
-
-    echo "\n------------Postprocess------------" >> peptideprophet.log
-    philosopher filter --pepxml interact.pep.xml --tag ${params.decoy_affix} >> peptideprophet.log
-    philosopher report >> peptideprophet.log
-    """
-}
-
-process peptideprophet_single {
-    label 'process_low'
-
-    publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
-
-    when:
-      params.search_engines.contains("msfragger")
-
-    input:
-    file database from searchengine_in_db_peptideprophet_single.mix(searchengine_in_db_decoy_peptideprophet_single)
-    file pepXML from pep_files_msfragger_single
-
-    output:
-    file "psm.tsv" into psm_ch_single
+    file "psm.tsv" into psm_ch
     file "*.log"
 
     """
@@ -805,47 +768,7 @@ process peptideprophet_single {
     """
 }
 
-(mzml_ids, mzml_files) = (mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)).separate(2)
-
-process ptmshepherd_all {
-
-    label 'process_low'
-
-    publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
-
-    when:
-      params.search_engines.contains("msfragger")
-
-    input:
-    file psm from psm_ch_all
-    path mzmls from mzml_files.collect()
-
-    output:
-    file "global.modsummary.tsv" into globalmod_ch_all
-    file "*.log"
-
-    """
-    echo "
-    dataset = ${custom_runName} $psm \$PWD
-    threads = ${task.cpus}
-    histo_bindivs = 5000
-    histo_smoothbins = 2
-    peakpicking_promRatio = 0.3
-    peakpicking_width = 0.002
-    peakpicking_topN = 500
-    precursor_tol = 0.01
-    spectra_ppmtol = 20.0
-    spectra_condPeaks = 100
-    spectra_condRatio = 0.02
-    varmod_masses = Failed_Carbamidomethylation:-57.021464 
-    localization_background = 4
-    output_extended = false" > shepherd_config.txt
-
-    java -jar /thirdparty/PTMShepherd/ptmshepherd-0.3.5.jar shepherd_config.txt > ${custom_runName}_ptmshepherd.log
-    """
-}
-
-process ptmshepherd_single {
+process ptmshepherd {
 
     label 'process_low'
 
@@ -855,11 +778,11 @@ process ptmshepherd_single {
       params.search_engines.contains("msfragger")
     
     input:
-    file psm from psm_ch_single
-    tuple val(mzml_id), file(mzml_file) from mzmls_ptmshepherd_single.mix(mzmls_ptmshepherd_single_picked)
+    file psm from psm_ch
+    tuple val(mzml_id), file(mzml_file) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)
 
     output:
-    file "global.modsummary.tsv" into globalmod_ch_single
+    file "global.modsummary.tsv" into globalmod_ch
     file "*.log"
 
     """
@@ -883,24 +806,7 @@ process ptmshepherd_single {
     """
 }
 
-process deltamass_all {
-
-    label 'process_low'
-
-    publishDir "${params.outdir}/Open_Search", mode: 'copy'
-
-    input:
-    file globalmod from globalmod_ch_all
-
-    output:
-    file "${custom_runName}_delta-mass.html"
-
-    """
-    python3 /thirdparty/MSFragger/Delta_Mass_Hist.py -i $globalmod -o ${custom_runName}_all_delta-mass.html
-    """
-}
-
-process deltamass_single {
+process deltamass {
 
     label 'process_low'
 
