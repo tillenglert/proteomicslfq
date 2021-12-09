@@ -774,6 +774,7 @@ process ptmshepherd {
     label 'process_low'
 
     publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
+    publishDir "${params.outdir}/open_search", mode: 'copy', pattern: '*global.modsummary.tsv'
 
     when:
       params.search_engines.contains("msfragger")
@@ -812,7 +813,7 @@ process deltamass {
 
     label 'process_low'
 
-    publishDir "${params.outdir}/Open_Search", mode: 'copy'
+    publishDir "${params.outdir}/open_search", mode: 'copy'
 
     input:
     tuple val(mzml_id), file(mzml_file), file(globalmod) from mzmls_deltamass.mix(mzmls_deltamass_picked).join(globalmod_ch)
