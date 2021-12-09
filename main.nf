@@ -779,8 +779,7 @@ process ptmshepherd {
       params.search_engines.contains("msfragger")
     
     input:
-    file psm from psm_ch
-    tuple val(mzml_id), file(mzml_file) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)
+    tuple val(mzml_id), file(mzml_file), file(psm) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked).combine(psm_ch)
 
     output:
     file "${mzml_file.baseName}_global.modsummary.tsv" into globalmod_ch
@@ -816,8 +815,7 @@ process deltamass {
     publishDir "${params.outdir}/Open_Search", mode: 'copy'
 
     input:
-    file globalmod from globalmod_ch
-    tuple val(mzml_id), file(mzml_file) from mzmls_deltamass.mix(mzmls_deltamass_picked)
+    tuple val(mzml_id), file(mzml_file), file(globalmod) from mzmls_deltamass.mix(mzmls_deltamass_picked).combine(globalmod_ch)
 
     output:
     file "${${mzml_file.baseName}}_delta-mass.html"
