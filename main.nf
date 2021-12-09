@@ -708,7 +708,7 @@ process search_engine_msfragger_open {
 
     when:
       params.search_engines.contains("msfragger")
-      params.open_search.contais("yes")
+      params.open_search.contains("yes")
 
     output:
      tuple val(mzml_id), file("${mzml_file.baseName}_msfragger.pepXML") into pep_files_msfragger
