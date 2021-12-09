@@ -61,6 +61,7 @@ def helpMessage() {
       --fragment_method             Used fragmentation method (currently unused since we let the search engines consider all MS2 spectra and let them determine from the spectrum metadata)
       --max_mods                    Maximum number of modifications per peptide. If this value is large, the search may take very long
       --db_debug                    Debug level during database search
+      --open_search                 Default is not to conduct an open search, if needed set this to "yes"
 
       //TODO probably also still some options missing. Try to consolidate them whenever the two search engines share them
 
@@ -707,6 +708,7 @@ process search_engine_msfragger_open {
 
     when:
       params.search_engines.contains("msfragger")
+      params.open_search.contais("yes")
 
     output:
      tuple val(mzml_id), file("${mzml_file.baseName}_msfragger.pepXML") into pep_files_msfragger
@@ -739,9 +741,6 @@ process peptideprophet {
     label 'process_low'
 
     publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
-
-    when:
-      params.search_engines.contains("msfragger")
 
     input:
     tuple file(database), val(mzml_id), file(pepXML) from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(pep_files_msfragger)
@@ -776,9 +775,6 @@ process ptmshepherd {
     publishDir "${params.outdir}/logs", mode: 'copy', pattern: '*.log'
     publishDir "${params.outdir}/open_search", mode: 'copy', pattern: '*global.modsummary.tsv'
 
-    when:
-      params.search_engines.contains("msfragger")
-    
     input:
     tuple val(mzml_id), file(mzml_file), file(psm) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked).join(psm_ch)
 
