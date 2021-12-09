@@ -709,7 +709,7 @@ process search_engine_msfragger_open {
       params.search_engines.contains("msfragger")
 
     output:
-     file("${mzml_file.baseName}_msfragger.pepXML") into pep_files_msfragger
+     tuple val(mzml_id), file("${mzml_file.baseName}_msfragger.pepXML") into pep_files_msfragger
      file "*.log"
 
     script:
@@ -744,10 +744,10 @@ process peptideprophet {
       params.search_engines.contains("msfragger")
 
     input:
-    tuple file(database), file(pepXML) from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(pep_files_msfragger)
+    tuple file(database), val(mzml_id), file(pepXML) from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(pep_files_msfragger)
     
     output:
-    file "${pepXML.baseName}_psm.tsv" into psm_ch
+    tuple val(mzml_id), file("${pepXML.baseName}_psm.tsv") into psm_ch
     file "*.log"
 
     """
@@ -779,10 +779,10 @@ process ptmshepherd {
       params.search_engines.contains("msfragger")
     
     input:
-    tuple val(mzml_id), file(mzml_file), file(psm) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked).combine(psm_ch)
+    tuple val(mzml_id), file(mzml_file), file(psm) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked).join(psm_ch)
 
     output:
-    file "${mzml_file.baseName}_global.modsummary.tsv" into globalmod_ch
+    tuple val(mzml_id), file("${mzml_file.baseName}_global.modsummary.tsv") into globalmod_ch
     file "*.log"
 
     """
@@ -815,7 +815,7 @@ process deltamass {
     publishDir "${params.outdir}/Open_Search", mode: 'copy'
 
     input:
-    tuple val(mzml_id), file(mzml_file), file(globalmod) from mzmls_deltamass.mix(mzmls_deltamass_picked).combine(globalmod_ch)
+    tuple val(mzml_id), file(mzml_file), file(globalmod) from mzmls_deltamass.mix(mzmls_deltamass_picked).join(globalmod_ch)
 
     output:
     file "${${mzml_file.baseName}}_delta-mass.html"
