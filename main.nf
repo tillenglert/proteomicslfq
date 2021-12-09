@@ -745,8 +745,9 @@ process peptideprophet {
 
     input:
     tuple file(database), file(pepXML) from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(pep_files_msfragger)
+    
     output:
-    file "psm.tsv" into psm_ch
+    file "psm.tsv".renameTo("${pepXML.baseName}_psm.tsv") into psm_ch
     file "*.log"
 
     """
@@ -780,7 +781,7 @@ process ptmshepherd {
     tuple val(mzml_id), file(mzml_file) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)
 
     output:
-    file "global.modsummary.tsv" into globalmod_ch
+    file "global.modsummary.tsv".renameTo("${mzml_file.baseName}_global.modsummary.tsv") into globalmod_ch
     file "*.log"
 
     """
@@ -815,10 +816,10 @@ process deltamass {
     tuple val(mzml_id), file(mzml_file) from mzmls_deltamass.mix(mzmls_deltamass_picked)
 
     output:
-    file "${custom_runName}_delta-mass.html"
+    file "${${mzml_file.baseName}}_delta-mass.html"
 
     """
-    python3 /thirdparty/MSFragger/Delta_Mass_Hist.py -i $globalmod -o ${custom_runName}_delta-mass.html
+    python3 /thirdparty/MSFragger/Delta_Mass_Hist.py -i $globalmod -o ${${mzml_file.baseName}}_delta-mass.html
     """
 }
 
