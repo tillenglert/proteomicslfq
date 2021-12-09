@@ -818,10 +818,10 @@ process deltamass {
     tuple val(mzml_id), file(mzml_file), file(globalmod) from mzmls_deltamass.mix(mzmls_deltamass_picked).join(globalmod_ch)
 
     output:
-    file "${${mzml_file.baseName}}_delta-mass.html"
+    file "${mzml_file.baseName}_delta-mass.html"
 
     """
-    python3 /thirdparty/MSFragger/Delta_Mass_Hist.py -i $globalmod -o ${${mzml_file.baseName}}_delta-mass.html
+    python3 /thirdparty/MSFragger/Delta_Mass_Hist.py -i $globalmod -o ${mzml_file.baseName}_delta-mass.html
     """
 }
 
