@@ -747,7 +747,7 @@ process peptideprophet {
     tuple file(database), file(pepXML) from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(pep_files_msfragger)
     
     output:
-    file "psm.tsv".renameTo("${pepXML.baseName}_psm.tsv") into psm_ch
+    file("psm.tsv").renameTo("${pepXML.baseName}_psm.tsv") into psm_ch
     file "*.log"
 
     """
@@ -781,7 +781,7 @@ process ptmshepherd {
     tuple val(mzml_id), file(mzml_file) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)
 
     output:
-    file "global.modsummary.tsv".renameTo("${mzml_file.baseName}_global.modsummary.tsv") into globalmod_ch
+    file("global.modsummary.tsv").renameTo("${mzml_file.baseName}_global.modsummary.tsv") into globalmod_ch
     file "*.log"
 
     """
