@@ -747,7 +747,7 @@ process peptideprophet {
     tuple file(database), file(pepXML) from searchengine_in_db_peptideprophet.mix(searchengine_in_db_decoy_peptideprophet).combine(pep_files_msfragger)
     
     output:
-    file("psm.tsv").renameTo("${pepXML.baseName}_psm.tsv") into psm_ch
+    file "${pepXML.baseName}_psm.tsv" into psm_ch
     file "*.log"
 
     """
@@ -764,6 +764,8 @@ process peptideprophet {
     echo "\n------------Postprocess------------" >> ${pepXML.baseName}_peptideprophet.log
     philosopher filter --pepxml "interact-${pepXML.baseName}.pep.xml" --tag ${params.decoy_affix} >> ${pepXML.baseName}_peptideprophet.log
     philosopher report >> ${pepXML.baseName}_peptideprophet.log
+
+    mv psm.tsv ${pepXML.baseName}_psm.tsv
     """
 }
 
@@ -781,7 +783,7 @@ process ptmshepherd {
     tuple val(mzml_id), file(mzml_file) from mzmls_ptmshepherd.mix(mzmls_ptmshepherd_picked)
 
     output:
-    file("global.modsummary.tsv").renameTo("${mzml_file.baseName}_global.modsummary.tsv") into globalmod_ch
+    file "${mzml_file.baseName}_global.modsummary.tsv" into globalmod_ch
     file "*.log"
 
     """
@@ -802,6 +804,8 @@ process ptmshepherd {
     output_extended = true" > shepherd_config.txt
 
     java -jar /thirdparty/PTMShepherd/ptmshepherd-0.3.5.jar shepherd_config.txt > ${mzml_file.baseName}_ptmshepherd.log
+
+    mv global.modsummary.tsv ${mzml_file.baseName}_global.modsummary.tsv
     """
 }
 
