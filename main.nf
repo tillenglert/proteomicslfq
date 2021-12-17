@@ -1387,8 +1387,8 @@ if (!params.enable_qc)
   ch_ptxqc_report = Channel.empty()
 }
 
-
-process pmultiqc {
+// Disable multiqc for now until fixed for msfragger
+/*process pmultiqc {
 
     label 'process_low'
     label 'process_single_thread'
@@ -1415,7 +1415,7 @@ process pmultiqc {
        ./proteomicslfq \\
        -o .
      """
-}
+}*/
 
 /*
  * Output Description HTML
