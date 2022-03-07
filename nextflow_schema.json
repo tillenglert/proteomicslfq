@@ -115,9 +115,8 @@
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
                 "open_search": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "Switch for Open Search if MSFragger is used as Search Engine",
-                    "default": "no",
                     "hidden": false,
                     "help_text": "Switch for Open Search if MSFragger is used as Search Engine. For usage set parameter to 'yes'"
                 }

@@ -520,6 +520,7 @@ process search_engine_msgf {
      //each file(mzml_file) from mzmls
     when:
       params.search_engines.contains("msgf")
+      !params.open_search
 
     output:
      tuple mzml_id, file("${mzml_file.baseName}_msgf.idXML") into id_files_msgf
@@ -590,6 +591,7 @@ process search_engine_comet {
     
     when:
       params.search_engines.contains("comet")
+      !params.open_search
 
     output:
      tuple mzml_id, file("${mzml_file.baseName}_comet.idXML") into id_files_comet
@@ -692,6 +694,7 @@ process search_engine_msfragger {
     
     when:
       params.search_engines.contains("msfragger")
+      !params.open_search
 
     output:
      tuple mzml_id, file("${mzml_file.baseName}_msfragger.idXML") into id_files_msfragger
@@ -736,7 +739,7 @@ process search_engine_msfragger_open {
     
     when:
       params.search_engines.contains("msfragger")
-      params.open_search.contains("yes")
+      params.open_search
 
     output:
      tuple val(mzml_id), file("${mzml_file.baseName}_msfragger.pepXML") into pep_files_msfragger
@@ -865,6 +868,9 @@ process index_peptides {
     output:
      tuple mzml_id, file("${id_file.baseName}_idx.idXML") into (id_files_idx_ForPerc, id_files_idx_ForIDPEP, id_files_idx_ForIDPEP_noFDR)
      file "*.log"
+
+    when:
+     !params.open_search
 
     script:
      def il = params.IL_equivalent ? '-IL_equivalent' : ''
