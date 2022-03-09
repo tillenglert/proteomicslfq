@@ -820,17 +820,23 @@ process ptmshepherd {
     histo_bindivs = 5000
     histo_smoothbins = 2
     peakpicking_promRatio = 0.3
+    peakpicking_mass_units = 0
     peakpicking_width = 0.002
     peakpicking_topN = 500
+    precursor_mass_units = 0
     precursor_tol = 0.01
+    annotation_tol = 0.01
+    varmod_masses = 
+    mass_offsets =
+    isotope_states = 
+    localization_background = 4
     spectra_ppmtol = 20.0
     spectra_condPeaks = 100
-    spectra_condRatio = 0.02
-    varmod_masses = Failed_Carbamidomethylation:-57.021464
-    localization_background = 4
-    output_extended = true" > shepherd_config.txt
+    spectra_condRatio = 0.01
+    compare_betweenRuns = false
+    output_extended = false" > shepherd_config.txt
 
-    java -jar /thirdparty/PTMShepherd/ptmshepherd-0.3.5.jar shepherd_config.txt > ${mzml_file.baseName}_ptmshepherd.log
+    java -jar /thirdparty/PTMShepherd/ptmshepherd-CLI-1.1.1.jar shepherd_config.txt > ${mzml_file.baseName}_ptmshepherd.log
 
     mv global.modsummary.tsv ${mzml_file.baseName}_global.modsummary.tsv
     """
