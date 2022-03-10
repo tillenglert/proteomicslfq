@@ -789,7 +789,7 @@ process peptideprophet {
     philosopher database --custom ${database} >> ${pepXML.baseName}_peptideprophet.log
 
     echo "--------------Read File--------------" >> ${pepXML.baseName}_peptideprophet.log
-    philosopher peptideprophet --database ${database} --ppm --accmass --expectscore --decoyprobs --nonparam ${pepXML} >> ${pepXML.baseName}_peptideprophet.log
+    philosopher peptideprophet --database ${database} --ppm --accmass --expectscore --decoyprobs --nonparam ${pepXML} --decoy ${params.decoy_affix} >> ${pepXML.baseName}_peptideprophet.log
 
     echo "\n------------Postprocess------------" >> ${pepXML.baseName}_peptideprophet.log
     philosopher filter --pepxml "interact-${pepXML.baseName}.pep.xml" --tag ${params.decoy_affix} >> ${pepXML.baseName}_peptideprophet.log
